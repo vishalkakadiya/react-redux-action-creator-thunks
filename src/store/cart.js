@@ -2,8 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialCounterState = {
     products: [],
-    totalQuantity: 0,
-    showCart: false
+    totalQuantity: 0
 };
 
 const cartSlice = createSlice({
@@ -12,27 +11,43 @@ const cartSlice = createSlice({
     reducers: {
         increaseQuantity(state, action) {
             state.products = state.products.map(product => {
-                if (action.payload.title === product.title) {
+                if (action.payload === product.title) {
                     product.quantity = product.quantity + 1;
-                    product.total = product.total + action.payload.price;
+                    product.total = product.total + product.price;
                 }
                 return product;
             });
         },
         decreaseQuantity(state, action) {
-            state.products = state.products.map(product => {
-                if (action.payload.title === product.title) {
-                    product.quantity = product.quantity - 1;
-                    product.total = product.total - action.payload.price;
+            const existingProduct = state.products.find(product => product.title === action.payload);
+            if(existingProduct) {
+                if (existingProduct.quantity === 1) {
+                    state.products = state.products.filter(product => product.title !== action.payload);
+                } else {
+                    existingProduct.quantity = existingProduct.quantity - 1;
+                    existingProduct.total = existingProduct.total - existingProduct.price;
                 }
-                return product;
-            });
+            }
         },
         addToCart(state, action) {
-            state.products = [...state.products, action.payload];
-            console.log(state.products);
-            state.totalQuantity = state.products.length;
-            // console.log(state);
+            const newProduct = action.payload;
+            const existingProduct = state.products.find(product => product.title === newProduct.title);
+            if(!existingProduct) {
+                state.products.push(action.payload);
+                state.totalQuantity = state.products.length;
+            } else {
+                existingProduct.quantity = existingProduct.quantity + 1;
+                existingProduct.total = existingProduct.total + existingProduct.price;
+            }
+        },
+        removeFromCart(state, action) {
+            const existingProduct = state.products.find(product => product.title === action.payload);
+            if (existingProduct.quantity === 1) {
+                state.products = state.products.filter(product => product.title !== action.payload);
+            } else {
+                existingProduct.quantity = existingProduct.quantity - 1;
+                existingProduct.total = existingProduct.total - existingProduct.price;
+            }
         },
         toggleCounter(state) {
             state.showCart = !state.showCart;
