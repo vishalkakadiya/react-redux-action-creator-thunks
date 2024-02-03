@@ -6,25 +6,32 @@ import Layout from './components/Layout/Layout';
 import Products from './components/Shop/Products';
 import Notification from "./components/UI/Notification";
 
-import { sendData } from "./store/cart";
+import { sendData, fetchData } from "./store/cart-actions";
 
 let initialCart = true;
 
 function App() {
     const dispatch = useDispatch();
+
     const showCart = useSelector(state => state.ui.showCart);
     const cart = useSelector(state => state.cart);
+    const changed = useSelector(state => state.cart.changed);
     const notification = useSelector(state => state.ui.notification);
 
     useEffect(() => {
+        dispatch(fetchData());
+    }, [dispatch]);
 
+    useEffect(() => {
         if (initialCart) {
             initialCart = false;
             return;
         }
 
-        dispatch(sendData(cart));
-    }, [cart, dispatch]);
+        if (changed) {
+            dispatch(sendData(cart));
+        }
+    }, [cart, changed, dispatch]);
 
     return (
         <>

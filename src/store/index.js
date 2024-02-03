@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-import cartReducer from './cart';
-import uiReducer from './ui';
+import cartReducer from './cart-slice';
+import uiReducer from './ui-slice';
 
 // configureStore will call one time only.
 const store = configureStore({
